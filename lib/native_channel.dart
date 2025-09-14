@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class NativeChannel {
-  static const MethodChannel _channel = MethodChannel('army_message/sms');
+  static const MethodChannel _channel = MethodChannel('army_message_v1/sms');
   
   static void initializeSmsListener(Function(String) onSmsReceived) {
     _channel.setMethodCallHandler((call) async {

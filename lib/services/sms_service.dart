@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SmsService with ChangeNotifier {
+  static const MethodChannel _channel = MethodChannel('army_message_v1/sms');
   List<String> _messages = [];
   String _targetPhoneNumber = '';
 
@@ -21,17 +23,23 @@ class SmsService with ChangeNotifier {
     return status.isGranted;
   }
 
-  // SMS gönderme method channel üzerinden
   Future<void> sendSms(String message) async {
     if (_targetPhoneNumber.isEmpty) {
       throw Exception('Hedef telefon numarası ayarlanmamış');
     }
 
-    // Method channel çağrısı - MainActivity.kt'de handle ediliyor
-    // Bu kısımda sadece state management yapıyoruz
-    // Gerçek SMS gönderme native tarafta olacak
-    _messages.add('Gönderilen: $message');
-    notifyListeners();
+    try {
+      // Kotlin tarafındaki sendSms metodunu çağır
+      await _channel.invokeMethod('sendSms', {
+        'number': _targetPhoneNumber,
+        'message': message,
+      });
+      
+      _messages.add('Gönderilen: $message');
+      notifyListeners();
+    } catch (e) {
+      throw Exception('SMS gönderilemedi: $e');
+    }
   }
 
   void addMessage(String message) {
