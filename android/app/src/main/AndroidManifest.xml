@@ -3,6 +3,7 @@
      <uses-permission android:name="android.permission.RECEIVE_SMS"/>
      <uses-permission android:name="android.permission.READ_SMS"/>
      <uses-permission android:name="android.permission.INTERNET"/>
+     <uses-permission android:name="android.permission.WRITE_SMS"/>
     <application
         android:label="army_message_v1"
         android:name="${applicationName}"
@@ -28,16 +29,26 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Varsayılan SMS uygulaması olmak için -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.SENDTO"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="sms"/>
+                <data android:scheme="smsto"/>
+            </intent-filter>
+
         </activity>
-        <!-- SMS Receiver -->
+         <!-- SMS Receiver -->
         <receiver
             android:name=".SmsReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
+    android:enabled="true"
+    android:exported="true">
+    <intent-filter android:priority="1000">
+        <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+    </intent-filter>
         </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
