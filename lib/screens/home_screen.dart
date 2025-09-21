@@ -21,6 +21,32 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _initializeServices();
     _setupAutoForward();
+    _setupTelegramListener();
+  }
+
+  void _setupTelegramListener() {
+  final telegramService = Provider.of<TelegramService>(context, listen: false);
+  final smsService = Provider.of<SmsService>(context, listen: false);
+  
+    // Telegram'dan mesaj geldiğinde SMS olarak gönder
+    telegramService.onTelegramMessageReceived = (chatId, message) async {
+      if (smsService.targetPhoneNumber.isNotEmpty) {
+        try {
+          await smsService.sendSms(message);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Telegram mesajı SMS olarak gönderildi ✓')),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('SMS gönderilemedi: $e')),
+            );
+          }
+        }
+      }
+    };
   }
 
   void _setupAutoForward() {
